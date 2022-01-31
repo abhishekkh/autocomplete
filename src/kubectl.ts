@@ -1,8 +1,8 @@
 // Internal scripts for this spec, not to be confused with the script property
 const scripts = {
-  types: "kubectl api-resources -o name",
+  types: "mq kube -- api-resources -o name",
   typeWithoutName: function (type) {
-    return `kubectl get ${type} -o custom-columns=:.metadata.name`;
+    return `mq kube -- get ${type} -o custom-columns=:.metadata.name`;
   },
 };
 
@@ -39,7 +39,8 @@ const sharedArgs: Record<string, Fig.Arg> = {
   runningPodsArg: {
     name: "Running Pods",
     generators: {
-      script: "kubectl get pods --field-selector=status.phase=Running -o name",
+      script:
+        "mq kube -- get pods --field-selector=status.phase=Running -o name",
       postProcess: sharedPostProcess,
     },
   },
@@ -60,11 +61,11 @@ const sharedArgs: Record<string, Fig.Arg> = {
       script: function (context) {
         const index = context.indexOf("--kubeconfig");
         if (index !== -1) {
-          return `kubectl config --kubeconfig=${
+          return `mq kube -- config --kubeconfig=${
             context[index + 1]
           } get-contexts -o name`;
         }
-        return "kubectl config get-contexts -o name";
+        return "mq kube -- config get-contexts -o name";
       },
       postProcess: sharedPostProcess,
     },
@@ -82,11 +83,11 @@ const sharedArgs: Record<string, Fig.Arg> = {
       script: function (context) {
         const index = context.indexOf("--kubeconfig");
         if (index !== -1) {
-          return `kubectl config --kubeconfig=${
+          return `mq kube -- config --kubeconfig=${
             context[index + 1]
           } get-clusters`;
         }
-        return "kubectl config get-clusters";
+        return "mq kube -- config get-clusters";
       },
       postProcess: function (out) {
         if (
@@ -150,7 +151,7 @@ const sharedArgs: Record<string, Fig.Arg> = {
         const podName = context[podIndex].includes("/")
           ? context[podIndex]
           : `${context[podIndex]} + ${context[podIndex + 1]}`;
-        return `kubectl get ${podName} -o json`;
+        return `mq kube -- get ${podName} -o json`;
       },
       postProcess: function (out) {
         if (
@@ -272,14 +273,14 @@ const sharedOpts: Record<string, Fig.Option> = {
   record: {
     name: "--record",
     description:
-      "Record current kubectl command in the resource annotation. If set to false, do not record the command. If set to true, record the command. If not set, default to updating the existing annotation value only if one already exists",
+      "Record current mq kube -- command in the resource annotation. If set to false, do not record the command. If set to true, record the command. If not set, default to updating the existing annotation value only if one already exists",
   },
 };
 
 const sharedOptsArray = Object.values(sharedOpts);
 
 const completionSpec: Fig.Spec = {
-  name: "kubectl",
+  name: "mq kube --",
   description: "",
   subcommands: [
     {
@@ -301,7 +302,7 @@ const completionSpec: Fig.Spec = {
             {
               name: "--attach",
               description:
-                "If true, wait for the Pod to start running, and then attach to the Pod as if 'kubectl attach ...' were called.  Default false, unless '-i/--stdin' is set, in which case the default is true",
+                "If true, wait for the Pod to start running, and then attach to the Pod as if 'mq kube -- attach ...' were called.  Default false, unless '-i/--stdin' is set, in which case the default is true",
               args: {},
             },
             {
@@ -529,7 +530,7 @@ const completionSpec: Fig.Spec = {
         {
           name: "set-last-applied",
           description:
-            "Set the latest last-applied-configuration annotations by setting it to match the contents of a file. This results in the last-applied-configuration being updated as though 'kubectl apply -f<file> ' was run, without updating any other parts of the object",
+            "Set the latest last-applied-configuration annotations by setting it to match the contents of a file. This results in the last-applied-configuration being updated as though 'mq kube -- apply -f<file> ' was run, without updating any other parts of the object",
           options: [
             sharedOpts.allowMissingTemplateKeys,
             sharedOpts.filename,
@@ -729,7 +730,7 @@ const completionSpec: Fig.Spec = {
         {
           name: "--save-config",
           description:
-            "If true, the configuration of current object will be saved in its annotation. Otherwise, the annotation will be unchanged. This flag is useful when you want to perform kubectl apply on this object in the future",
+            "If true, the configuration of current object will be saved in its annotation. Otherwise, the annotation will be unchanged. This flag is useful when you want to perform mq kube -- apply on this object in the future",
         },
       ],
     },
@@ -780,7 +781,7 @@ const completionSpec: Fig.Spec = {
     {
       name: "cluster-info",
       description:
-        "Display addresses of the master and services with label kubernetes.io/cluster-service=true To further debug and diagnose cluster problems, use 'kubectl cluster-info dump'",
+        "Display addresses of the master and services with label kubernetes.io/cluster-service=true To further debug and diagnose cluster problems, use 'mq kube -- cluster-info dump'",
       subcommands: [
         {
           name: "dump",
@@ -830,12 +831,12 @@ const completionSpec: Fig.Spec = {
     {
       name: "completion",
       description:
-        "Output shell completion code for the specified shell (bash or zsh). The shell code must be evaluated to provide interactive completion of kubectl commands.  This can be done by sourcing it from the .bash_profile",
+        "Output shell completion code for the specified shell (bash or zsh). The shell code must be evaluated to provide interactive completion of mq kube -- commands.  This can be done by sourcing it from the .bash_profile",
     },
     {
       name: "config",
       description:
-        'Modify kubeconfig files using subcommands like "kubectl config set current-context my-context"',
+        'Modify kubeconfig files using subcommands like "mq kube -- config set current-context my-context"',
       options: [
         {
           name: "--kubeconfig",
@@ -1220,7 +1221,7 @@ const completionSpec: Fig.Spec = {
         {
           name: "--save-config",
           description:
-            "If true, the configuration of current object will be saved in its annotation. Otherwise, the annotation will be unchanged. This flag is useful when you want to perform kubectl apply on this object in the future",
+            "If true, the configuration of current object will be saved in its annotation. Otherwise, the annotation will be unchanged. This flag is useful when you want to perform mq kube -- apply on this object in the future",
         },
         {
           name: "--validate",
@@ -1274,7 +1275,7 @@ const completionSpec: Fig.Spec = {
             {
               name: "--save-config",
               description:
-                "If true, the configuration of current object will be saved in its annotation. Otherwise, the annotation will be unchanged. This flag is useful when you want to perform kubectl apply on this object in the future",
+                "If true, the configuration of current object will be saved in its annotation. Otherwise, the annotation will be unchanged. This flag is useful when you want to perform mq kube -- apply on this object in the future",
             },
             {
               name: "--validate",
@@ -1329,7 +1330,7 @@ const completionSpec: Fig.Spec = {
             {
               name: "--save-config",
               description:
-                "If true, the configuration of current object will be saved in its annotation. Otherwise, the annotation will be unchanged. This flag is useful when you want to perform kubectl apply on this object in the future",
+                "If true, the configuration of current object will be saved in its annotation. Otherwise, the annotation will be unchanged. This flag is useful when you want to perform mq kube -- apply on this object in the future",
             },
             {
               name: "--serviceaccount",
@@ -1392,7 +1393,7 @@ const completionSpec: Fig.Spec = {
             {
               name: "--save-config",
               description:
-                "If true, the configuration of current object will be saved in its annotation. Otherwise, the annotation will be unchanged. This flag is useful when you want to perform kubectl apply on this object in the future",
+                "If true, the configuration of current object will be saved in its annotation. Otherwise, the annotation will be unchanged. This flag is useful when you want to perform mq kube -- apply on this object in the future",
             },
             {
               name: "--validate",
@@ -1432,7 +1433,7 @@ const completionSpec: Fig.Spec = {
             {
               name: "--save-config",
               description:
-                "If true, the configuration of current object will be saved in its annotation. Otherwise, the annotation will be unchanged. This flag is useful when you want to perform kubectl apply on this object in the future",
+                "If true, the configuration of current object will be saved in its annotation. Otherwise, the annotation will be unchanged. This flag is useful when you want to perform mq kube -- apply on this object in the future",
             },
             {
               name: "--schedule",
@@ -1471,7 +1472,7 @@ const completionSpec: Fig.Spec = {
             {
               name: "--save-config",
               description:
-                "If true, the configuration of current object will be saved in its annotation. Otherwise, the annotation will be unchanged. This flag is useful when you want to perform kubectl apply on this object in the future",
+                "If true, the configuration of current object will be saved in its annotation. Otherwise, the annotation will be unchanged. This flag is useful when you want to perform mq kube -- apply on this object in the future",
             },
             {
               name: "--validate",
@@ -1587,7 +1588,7 @@ const completionSpec: Fig.Spec = {
             {
               name: "--save-config",
               description:
-                "If true, the configuration of current object will be saved in its annotation. Otherwise, the annotation will be unchanged. This flag is useful when you want to perform kubectl apply on this object in the future",
+                "If true, the configuration of current object will be saved in its annotation. Otherwise, the annotation will be unchanged. This flag is useful when you want to perform mq kube -- apply on this object in the future",
             },
             {
               name: "--validate",
@@ -1610,7 +1611,7 @@ const completionSpec: Fig.Spec = {
             {
               name: "--save-config",
               description:
-                "If true, the configuration of current object will be saved in its annotation. Otherwise, the annotation will be unchanged. This flag is useful when you want to perform kubectl apply on this object in the future",
+                "If true, the configuration of current object will be saved in its annotation. Otherwise, the annotation will be unchanged. This flag is useful when you want to perform mq kube -- apply on this object in the future",
             },
             {
               name: "--validate",
@@ -1651,7 +1652,7 @@ const completionSpec: Fig.Spec = {
             {
               name: "--save-config",
               description:
-                "If true, the configuration of current object will be saved in its annotation. Otherwise, the annotation will be unchanged. This flag is useful when you want to perform kubectl apply on this object in the future",
+                "If true, the configuration of current object will be saved in its annotation. Otherwise, the annotation will be unchanged. This flag is useful when you want to perform mq kube -- apply on this object in the future",
             },
             {
               name: "--validate",
@@ -1698,7 +1699,7 @@ const completionSpec: Fig.Spec = {
             {
               name: "--save-config",
               description:
-                "If true, the configuration of current object will be saved in its annotation. Otherwise, the annotation will be unchanged. This flag is useful when you want to perform kubectl apply on this object in the future",
+                "If true, the configuration of current object will be saved in its annotation. Otherwise, the annotation will be unchanged. This flag is useful when you want to perform mq kube -- apply on this object in the future",
             },
             {
               name: "--validate",
@@ -1744,7 +1745,7 @@ const completionSpec: Fig.Spec = {
             {
               name: "--save-config",
               description:
-                "If true, the configuration of current object will be saved in its annotation. Otherwise, the annotation will be unchanged. This flag is useful when you want to perform kubectl apply on this object in the future",
+                "If true, the configuration of current object will be saved in its annotation. Otherwise, the annotation will be unchanged. This flag is useful when you want to perform mq kube -- apply on this object in the future",
             },
             {
               name: "--scopes",
@@ -1788,7 +1789,7 @@ const completionSpec: Fig.Spec = {
             {
               name: "--save-config",
               description:
-                "If true, the configuration of current object will be saved in its annotation. Otherwise, the annotation will be unchanged. This flag is useful when you want to perform kubectl apply on this object in the future",
+                "If true, the configuration of current object will be saved in its annotation. Otherwise, the annotation will be unchanged. This flag is useful when you want to perform mq kube -- apply on this object in the future",
             },
             {
               name: "--validate",
@@ -1846,7 +1847,7 @@ const completionSpec: Fig.Spec = {
             {
               name: "--save-config",
               description:
-                "If true, the configuration of current object will be saved in its annotation. Otherwise, the annotation will be unchanged. This flag is useful when you want to perform kubectl apply on this object in the future",
+                "If true, the configuration of current object will be saved in its annotation. Otherwise, the annotation will be unchanged. This flag is useful when you want to perform mq kube -- apply on this object in the future",
             },
             {
               name: "--serviceaccount",
@@ -1934,7 +1935,7 @@ const completionSpec: Fig.Spec = {
                 {
                   name: "--save-config",
                   description:
-                    "If true, the configuration of current object will be saved in its annotation. Otherwise, the annotation will be unchanged. This flag is useful when you want to perform kubectl apply on this object in the future",
+                    "If true, the configuration of current object will be saved in its annotation. Otherwise, the annotation will be unchanged. This flag is useful when you want to perform mq kube -- apply on this object in the future",
                 },
                 {
                   name: "--validate",
@@ -1989,7 +1990,7 @@ const completionSpec: Fig.Spec = {
                 {
                   name: "--save-config",
                   description:
-                    "If true, the configuration of current object will be saved in its annotation. Otherwise, the annotation will be unchanged. This flag is useful when you want to perform kubectl apply on this object in the future",
+                    "If true, the configuration of current object will be saved in its annotation. Otherwise, the annotation will be unchanged. This flag is useful when you want to perform mq kube -- apply on this object in the future",
                 },
                 {
                   name: "--type",
@@ -2040,7 +2041,7 @@ const completionSpec: Fig.Spec = {
                 {
                   name: "--save-config",
                   description:
-                    "If true, the configuration of current object will be saved in its annotation. Otherwise, the annotation will be unchanged. This flag is useful when you want to perform kubectl apply on this object in the future",
+                    "If true, the configuration of current object will be saved in its annotation. Otherwise, the annotation will be unchanged. This flag is useful when you want to perform mq kube -- apply on this object in the future",
                 },
                 {
                   name: "--validate",
@@ -2080,7 +2081,7 @@ const completionSpec: Fig.Spec = {
                 {
                   name: "--save-config",
                   description:
-                    "If true, the configuration of current object will be saved in its annotation. Otherwise, the annotation will be unchanged. This flag is useful when you want to perform kubectl apply on this object in the future",
+                    "If true, the configuration of current object will be saved in its annotation. Otherwise, the annotation will be unchanged. This flag is useful when you want to perform mq kube -- apply on this object in the future",
                 },
                 {
                   name: "--tcp",
@@ -2120,7 +2121,7 @@ const completionSpec: Fig.Spec = {
                 {
                   name: "--save-config",
                   description:
-                    "If true, the configuration of current object will be saved in its annotation. Otherwise, the annotation will be unchanged. This flag is useful when you want to perform kubectl apply on this object in the future",
+                    "If true, the configuration of current object will be saved in its annotation. Otherwise, the annotation will be unchanged. This flag is useful when you want to perform mq kube -- apply on this object in the future",
                 },
                 {
                   name: "--tcp",
@@ -2153,7 +2154,7 @@ const completionSpec: Fig.Spec = {
                 {
                   name: "--save-config",
                   description:
-                    "If true, the configuration of current object will be saved in its annotation. Otherwise, the annotation will be unchanged. This flag is useful when you want to perform kubectl apply on this object in the future",
+                    "If true, the configuration of current object will be saved in its annotation. Otherwise, the annotation will be unchanged. This flag is useful when you want to perform mq kube -- apply on this object in the future",
                 },
                 {
                   name: "--tcp",
@@ -2193,7 +2194,7 @@ const completionSpec: Fig.Spec = {
                 {
                   name: "--save-config",
                   description:
-                    "If true, the configuration of current object will be saved in its annotation. Otherwise, the annotation will be unchanged. This flag is useful when you want to perform kubectl apply on this object in the future",
+                    "If true, the configuration of current object will be saved in its annotation. Otherwise, the annotation will be unchanged. This flag is useful when you want to perform mq kube -- apply on this object in the future",
                 },
                 {
                   name: "--tcp",
@@ -2227,7 +2228,7 @@ const completionSpec: Fig.Spec = {
             {
               name: "--save-config",
               description:
-                "If true, the configuration of current object will be saved in its annotation. Otherwise, the annotation will be unchanged. This flag is useful when you want to perform kubectl apply on this object in the future",
+                "If true, the configuration of current object will be saved in its annotation. Otherwise, the annotation will be unchanged. This flag is useful when you want to perform mq kube -- apply on this object in the future",
             },
             {
               name: "--validate",
@@ -2440,7 +2441,7 @@ const completionSpec: Fig.Spec = {
         {
           name: "--save-config",
           description:
-            "If true, the configuration of current object will be saved in its annotation. Otherwise, the annotation will be unchanged. This flag is useful when you want to perform kubectl apply on this object in the future",
+            "If true, the configuration of current object will be saved in its annotation. Otherwise, the annotation will be unchanged. This flag is useful when you want to perform mq kube -- apply on this object in the future",
         },
         {
           name: "--validate",
@@ -2586,7 +2587,7 @@ const completionSpec: Fig.Spec = {
         {
           name: "--save-config",
           description:
-            "If true, the configuration of current object will be saved in its annotation. Otherwise, the annotation will be unchanged. This flag is useful when you want to perform kubectl apply on this object in the future",
+            "If true, the configuration of current object will be saved in its annotation. Otherwise, the annotation will be unchanged. This flag is useful when you want to perform mq kube -- apply on this object in the future",
         },
         {
           name: "--session-affinity",
@@ -2949,7 +2950,7 @@ const completionSpec: Fig.Spec = {
         {
           name: "--address",
           description:
-            "Addresses to listen on (comma separated). Only accepts IP addresses or localhost as a value. When localhost is supplied, kubectl will try to bind on both 127.0.0.1 and ::1 and will fail if neither of these addresses are available to bind",
+            "Addresses to listen on (comma separated). Only accepts IP addresses or localhost as a value. When localhost is supplied, mq kube -- will try to bind on both 127.0.0.1 and ::1 and will fail if neither of these addresses are available to bind",
           args: {},
         },
         {
@@ -3085,7 +3086,7 @@ const completionSpec: Fig.Spec = {
         {
           name: "--save-config",
           description:
-            "If true, the configuration of current object will be saved in its annotation. Otherwise, the annotation will be unchanged. This flag is useful when you want to perform kubectl apply on this object in the future",
+            "If true, the configuration of current object will be saved in its annotation. Otherwise, the annotation will be unchanged. This flag is useful when you want to perform mq kube -- apply on this object in the future",
         },
         {
           name: "--timeout",
@@ -3249,7 +3250,7 @@ const completionSpec: Fig.Spec = {
         {
           name: "--attach",
           description:
-            "If true, wait for the Pod to start running, and then attach to the Pod as if 'kubectl attach ...' were called.  Default false, unless '-i/--stdin' is set, in which case the default is true. With '--restart=Never' the exit code of the container process is returned",
+            "If true, wait for the Pod to start running, and then attach to the Pod as if 'mq kube -- attach ...' were called.  Default false, unless '-i/--stdin' is set, in which case the default is true. With '--restart=Never' the exit code of the container process is returned",
         },
         {
           name: "--cascade",
@@ -3374,7 +3375,7 @@ const completionSpec: Fig.Spec = {
         {
           name: "--save-config",
           description:
-            "If true, the configuration of current object will be saved in its annotation. Otherwise, the annotation will be unchanged. This flag is useful when you want to perform kubectl apply on this object in the future",
+            "If true, the configuration of current object will be saved in its annotation. Otherwise, the annotation will be unchanged. This flag is useful when you want to perform mq kube -- apply on this object in the future",
         },
         {
           name: "--serviceaccount",
@@ -3512,7 +3513,7 @@ const completionSpec: Fig.Spec = {
             {
               name: "--list",
               description:
-                "If true, display the environment and any changes in the standard format. this flag will removed when we have kubectl view env",
+                "If true, display the environment and any changes in the standard format. this flag will removed when we have mq kube -- view env",
             },
             {
               name: "--overwrite",
